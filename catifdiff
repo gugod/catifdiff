@@ -1,0 +1,63 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Digest::SHA qw(sha1_hex);
+
+sub slurp_file {
+    my ($file) = @_;
+    local $/ = undef;
+    open my $fh, "<", $file;
+    return <$fh>;
+}
+
+sub slurp_stdin {
+    local $/ = undef;
+    return <STDIN>;
+}
+
+sub write_file {
+    my ($file, $content) = @_;
+    open my $fh, ">", $file;
+    print $fh $content;
+}
+
+sub slurp_all_input {
+    my (@argv) = @_;
+
+    my $body;
+
+    if (-p STDIN) {
+        $body = slurp_stdin();
+    }
+    else {
+        die "catifdiff only takes input from STDIN\n";
+    }
+
+    return $body;
+}
+
+sub body_digest_last_time {
+    my $store = $_[0];
+    return -f $store ? slurp_file($store) : undef
+}
+
+sub store_body_digest {
+    write_file( $_[0], $_[1] );
+}
+
+sub main {
+    my $store = $_[0] || "/tmp/catifdiff";
+
+    my $body = slurp_all_input;
+
+    my $body_digest = sha1_hex($body);
+
+    if ($_ = body_digest_last_time($store)) {
+        return if $body_digest eq $_;
+    }
+
+    write_file($store, $body_digest);
+    print $body;
+}
+
+main(@ARGV);
