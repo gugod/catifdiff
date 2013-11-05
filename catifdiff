@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
+use Getopt::Std;
 use Digest::SHA qw(sha1_hex);
 
 sub slurp_file {
@@ -46,7 +47,8 @@ sub store_body_digest {
 }
 
 sub main {
-    my $store = $_[0] || "/tmp/catifdiff";
+    my %args = @_;
+    my $store = $args{store};
 
     my $body = slurp_all_input;
 
@@ -60,4 +62,7 @@ sub main {
     print $body;
 }
 
-main(@ARGV);
+
+my %opts;
+getopt('s:', \%opts);
+main(store => $opts{s});
