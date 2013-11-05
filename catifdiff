@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
+use v5.10;
 use Getopt::Std;
 use Digest::SHA qw(sha1_hex);
 
@@ -62,7 +63,23 @@ sub main {
     print $body;
 }
 
-
 my %opts;
 getopt('s:', \%opts);
 main(store => $opts{s});
+
+__END__
+
+=head1 USAGE
+
+some-program | catifdiff -s /path/db
+
+catifdiff does only one job. It captures STDIN for some program output, and only
+yield the output if the program output is different from last run. The db specified
+with C<-s> stores the digest of.
+
+=head1 INSTALLATION
+
+Just put the program somewhere. There are no external dependencies if using Perl
+v5.10 or newer.
+
+=cut
